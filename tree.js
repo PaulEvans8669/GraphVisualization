@@ -147,8 +147,8 @@ function draw(){
 function mouseDragged(){
     let n = getPressedNode(tree);
     if(n != null){
-        let deltaX = (mouseX - pmouseX)/2;
-        let deltaY = (mouseY - pmouseY)/2;
+        let deltaX = mouseX - pmouseX;
+        let deltaY = mouseY - pmouseY;
         n.position.x+= deltaX;
         n.position.y+= deltaY;
         tree.drawTree();
