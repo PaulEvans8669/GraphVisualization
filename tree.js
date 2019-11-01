@@ -76,7 +76,6 @@ let Tree = class{
         this.nodeList = [];
         for(let i = 0; i < size; i++){
             let tag = String.fromCharCode(65+i);
-            console.log(i === 0);
             if(i === 0){
                 let posX = getRandomIntMinMax(circleSize,canvasW);
                 let posY = getRandomIntMinMax(circleSize,canvasH);
@@ -104,7 +103,6 @@ let Tree = class{
     }
 
     drawTree(){
-        console.log("draw tree");
         clear();
         background(255);
         for(let i = 0; i< this.linkList.length; i++){
