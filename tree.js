@@ -115,8 +115,8 @@ let Tree = class{
         }
     }
     getNewRandomPosition(){
-        let posX = getRandomIntMinMax(circleSize*2,canvasW-circleSize);
-        let posY = getRandomIntMinMax(circleSize*2,canvasH-circleSize);
+        let posX = getRandomIntMinMax(circleSize*2,windowWidth-circleSize);
+        let posY = getRandomIntMinMax(circleSize*2,windowHeight-circleSize);
         let posIsOk = true;
         for(let i = 0; i<this.nodeList.length; i++){
             let n = this.nodeList[i];
