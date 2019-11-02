@@ -5,8 +5,6 @@ function getRandomIntMax(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
-let canvasW = 750;
-let canvasH = 750;
 let circleSize = 50;
 let fontSize = 16;
 
@@ -70,7 +68,7 @@ let Link = class {
     }
 };
 
-let Tree = class{
+let Graph = class{
     constructor(size){
         //init Nodes
         this.nodeList = [];
@@ -90,7 +88,7 @@ let Tree = class{
             let n = this.nodeList[i];
             let tmp = this.nodeList.slice(0);
             tmp.splice(i,1);
-            for(let j = 0; j<getRandomIntMinMax(1,3);j++){
+            for(let j = 0; j<getRandomIntMinMax(1,4);j++){
                 let nodeIndex = getRandomIntMax(tmp.length-1);
                 let n2 = tmp[nodeIndex];
                 if(!n.isLinkedWith(n2)){
@@ -99,10 +97,10 @@ let Tree = class{
                 }
             }
         }
-        this.drawTree();
+        this.drawGraph();
     }
 
-    drawTree(){
+    drawGraph(){
         clear();
         background(255);
         for(let i = 0; i< this.linkList.length; i++){
@@ -113,8 +111,8 @@ let Tree = class{
         }
     }
     getNewRandomPosition(){
-        let posX = getRandomIntMinMax(circleSize*2,windowWidth-circleSize);
-        let posY = getRandomIntMinMax(circleSize*2,windowHeight-circleSize);
+        let posX = getRandomIntMinMax(circleSize*2,canvasW-circleSize);
+        let posY = getRandomIntMinMax(circleSize*2,canvasH-circleSize);
         let posIsOk = true;
         for(let i = 0; i<this.nodeList.length; i++){
             let n = this.nodeList[i];
@@ -132,30 +130,51 @@ let Tree = class{
 };
 
 
-let tree;
+let graph;
 function setup(){
-    let canvas = createCanvas(windowWidth, windowHeight);
-    canvas.parent("treeVis");
+    let canvas = createCanvas(canvasW, canvasH);
+    canvas.parent("graphVis");
+    newGraph();
+}
+
+function newGraph(){
+    clear();
     background(255);
-    tree = new Tree(7);
+    graph = new Graph(getRandomIntMinMax(5,10));
+}
+
+function reset(){
+    clear();
+    background(255);
+    graph.drawGraph();
 }
 
 function draw(){
 }
+
+let pressed = false;
+let pressedNode = null;
+function mousePressed(){
+    if(!pressed){
+        pressedNode = getPressedNode(graph);
+        pressed = true;
+    }
+}
+function mouseReleased() {
+    pressed = false;
+    pressedNode = null
+}
 function mouseDragged(){
-    let n = getPressedNode(tree);
-    if(n != null){
-        let deltaX = mouseX - pmouseX;
-        let deltaY = mouseY - pmouseY;
-        n.position.x+= deltaX;
-        n.position.y+= deltaY;
-        tree.drawTree();
+    if(pressed && pressedNode != null){
+        pressedNode.position.x = mouseX;
+        pressedNode.position.y = mouseY;
+        graph.drawGraph();
     }
 }
 
-function getPressedNode(tree){
-    for(let i = 0; i < tree.nodeList.length; i++){
-        let n = tree.nodeList[i];
+function getPressedNode(graph){
+    for(let i = 0; i < graph.nodeList.length; i++){
+        let n = graph.nodeList[i];
         let p = n.position;
         if(Math.abs(p.x - mouseX)<circleSize/2 && Math.abs(p.y - mouseY)<circleSize/2){
             return n;
