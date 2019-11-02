@@ -2,30 +2,45 @@
 <html class="h-100">
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"/>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+    <meta charset="UTF-8">
+    <script>
+        let weighted = true;
+        let oriented = false;
+    </script>
 </head>
 <body class="h-100">
 <main class="container-flex h-100 bg-info">
     <nav id="nav" class="nav nav-pills bg-info">
         <div class="nav-item nav-link mx-1">
-            <button class="btn btn-secondary" onclick="newGraph();">Nouveau graph</button>
-        </div>
-        <div class="nav-item nav-link mx-1">
-            <button class="btn btn-secondary">Reset</button>
+            <button type="button" class="btn btn-secondary" onclick="newGraph();">
+                Nouveau graph
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="optionsDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="dropdown-menu text-center" aria-labelledby="optionsDropdownMenuButton">
+                    <label>
+                        Pondéré <input type="checkbox" onclick="weighted = this.checked" checked/>
+                    </label>
+                    <br>
+                    <label>
+                        Orienté <input type="checkbox" onclick="oriented = this.checked"/>
+                    </label>
+                </div>
+            </button>
         </div>
         <div class="nav-item dropdown nav-link mx-1">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="algosDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Algorithmes
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <button class="dropdown-item btn-light" disabled>Prims</button>
-                <button class="dropdown-item btn-light" disabled>Algo 2</button>
-                <button class="dropdown-item btn-light" disabled>Algo 3</button>
+            <div class="dropdown-menu" aria-labelledby="algosDropdownMenuButton">
+                <button class="dropdown-item btn-light" disabled>Prim</button>
             </div>
         </div>
     </nav>

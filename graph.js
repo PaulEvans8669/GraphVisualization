@@ -46,12 +46,13 @@ let Node = class{
 
 let Link = class {
 
-    constructor(node1, node2, weight){
+    constructor(node1, node2, weight, oriented){
         this.node1 = node1;
         this.node2 = node2;
         this.node1.links.push(this);
         this.node2.links.push(this);
         this.weight = weight;
+        this.oriented = oriented;
     }
 
     drawLink(){
@@ -59,27 +60,46 @@ let Link = class {
         let y1 = this.node1.position.y;
         let x2 = this.node2.position.x;
         let y2 = this.node2.position.y;
+        if(this.oriented) {
+            push(); //start new drawing state
+            let angle = Math.atan2(y1 - y2, x1 - x2); //gets the angle of the line
+            translate(x2, y2); //translates to the destination vertex
+            rotate(angle-HALF_PI); //rotates the arrow point
+            let offset = 15;
+            let radians = Math.atan(angle);
+            translate(0, (circleSize+ offset)/2 );
+            triangle(-offset*0.5, offset, offset*0.5, offset, 0, -offset/2); //draws the arrow point as a triangle
+            pop();
+        }
         stroke(0);
-        line(x1,y1,x2,y2);
-        fill(0);
-        text(this.weight,(x1+x2)/2,(y1+y2)/2);
+        line(x1, y1, x2, y2);
+        if(this.weight != null) {
+            fill(0);
+            text(this.weight, (x1 + x2) / 2, (y1 + y2) / 2);
+        }
         this.node1.drawNode();
         this.node2.drawNode();
     }
 };
 
 let Graph = class{
-    constructor(size){
+    constructor(size, weighted, oriented){
+        this.weighted = weighted;
+        this.oriented = oriented;
         //init Nodes
         this.nodeList = [];
         for(let i = 0; i < size; i++){
-            let tag = String.fromCharCode(65+i);
+            let tag = String.fromCharCode(65 + i);
             if(i === 0){
                 let posX = getRandomIntMinMax(circleSize,canvasW);
                 let posY = getRandomIntMinMax(circleSize,canvasH);
                 this.nodeList.push(new Node(new Position(posX, posY),tag));
             }else{
-                this.nodeList.push(new Node(this.getNewRandomPosition(),tag));
+                let pos = null;
+                while(pos === null){
+                    pos = this.getNewRandomPosition();
+                }
+                this.nodeList.push(new Node(pos,tag));
             }
         }
         //init Links
@@ -89,11 +109,17 @@ let Graph = class{
             let tmp = this.nodeList.slice(0);
             tmp.splice(i,1);
             for(let j = 0; j<getRandomIntMinMax(1,4);j++){
-                let nodeIndex = getRandomIntMax(tmp.length-1);
-                let n2 = tmp[nodeIndex];
-                if(!n.isLinkedWith(n2)){
-                    this.linkList.push(new Link(n,n2,getRandomIntMinMax(1,15)));
-                    tmp.splice(nodeIndex,1);
+                if(tmp.length !== 0) {
+                    let nodeIndex = getRandomIntMax(tmp.length - 1);
+                    let n2 = tmp[nodeIndex];
+                    if (!n.isLinkedWith(n2)) {
+                        let weight = null;
+                        if (this.weighted) {
+                            weight = getRandomIntMinMax(1, 15)
+                        }
+                        this.linkList.push(new Link(n, n2, weight, this.oriented));
+                        tmp.splice(nodeIndex, 1);
+                    }
                 }
             }
         }
@@ -123,7 +149,7 @@ let Graph = class{
         if(posIsOk){
             return new Position(posX, posY);
         }else{
-            return this.getNewRandomPosition();
+            return null;
         }
     }
 
@@ -140,7 +166,7 @@ function setup(){
 function newGraph(){
     clear();
     background(255);
-    graph = new Graph(getRandomIntMinMax(5,10));
+    graph = new Graph(getRandomIntMinMax(5,8), weighted, oriented);
 }
 
 function reset(){
@@ -181,4 +207,17 @@ function getPressedNode(graph){
         }
     }
     return null;
+}
+
+function prim(graph) {
+    let dist = {};
+    let pred = {};
+    let arbre = [];
+    for (let i = 0 ; i <graph.nodeList.length ; i++){
+        let node = graph.nodeList[i];
+        distance[node.tag] = 9999;
+    }
+    arbre.push("A");
+    dist["A"] = 0;
+    pred["A"] = 0;
 }
