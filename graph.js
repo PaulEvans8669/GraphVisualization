@@ -15,20 +15,35 @@ let Position = class {
     }
 };
 
+let Color = class{
+    constructor(r,g = null,b = null){
+        if(g === null || b === null){
+            this.r = r;
+            this.g = r;
+            this.b = r;
+        }else{
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+    }
+};
+
 let Node = class{
     constructor(position, tag){
         this.position = position;
         this.tag = tag;
         this.links = [];
+        this.color = new Color(0);
         this.drawNode();
     }
 
     drawNode(){
-        stroke(0);
+        stroke(this.color.r,this.color.g,this.color.b);
         fill(255);
         ellipse(this.position.x, this.position.y, circleSize,circleSize);
         textSize(fontSize);
-        fill(0);
+        fill(this.color.r,this.color.g,this.color.b);
         text(this.tag,this.position.x-fontSize/2+3,this.position.y+fontSize/2-1);
     }
 
@@ -53,6 +68,7 @@ let Link = class {
         this.node2.links.push(this);
         this.weight = weight;
         this.oriented = oriented;
+        this.color = new Color(0);
     }
 
     drawLink(){
@@ -62,6 +78,8 @@ let Link = class {
         let y2 = this.node2.position.y;
         if(this.oriented) {
             push(); //start new drawing state
+            stroke(this.color.r,this.color.g,this.color.b);
+            fill(this.color.r,this.color.g,this.color.b);
             let angle = Math.atan2(y1 - y2, x1 - x2); //gets the angle of the line
             translate(x2, y2); //translates to the destination vertex
             rotate(angle-HALF_PI); //rotates the arrow point
@@ -71,10 +89,10 @@ let Link = class {
             triangle(-offset*0.5, offset, offset*0.5, offset, 0, -offset/2); //draws the arrow point as a triangle
             pop();
         }
-        stroke(0);
+        stroke(this.color.r,this.color.g,this.color.b);
         line(x1, y1, x2, y2);
         if(this.weight != null) {
-            fill(0);
+            fill(this.color.r,this.color.g,this.color.b);
             text(this.weight, (x1 + x2) / 2, (y1 + y2) / 2);
         }
         this.node1.drawNode();
@@ -126,31 +144,26 @@ let Graph = class{
         this.drawGraph();
     }
 
-    drawGraph(){
+    drawGraph(resetBlack = false){
         clear();
         background(255);
         for(let i = 0; i< this.linkList.length; i++){
+            if(resetBlack){
+                this.linkList[i].color = new Color(0);
+            }
             this.linkList[i].drawLink();
         }
         for(let i = 0; i< this.nodeList.length; i++){
+            if(resetBlack){
+                this.nodeList[i].color = new Color(0);
+            }
             this.nodeList[i].drawNode();
         }
     }
     getNewRandomPosition(){
         let posX = getRandomIntMinMax(circleSize*2,canvasW-circleSize);
         let posY = getRandomIntMinMax(circleSize*2,canvasH-circleSize);
-        let posIsOk = true;
-        for(let i = 0; i<this.nodeList.length; i++){
-            let n = this.nodeList[i];
-            if(posIsOk && (Math.abs(n.position.x-posX)<circleSize || Math.abs(n.position.y-posY)<circleSize)){
-                posIsOk = false;
-            }
-        }
-        if(posIsOk){
-            return new Position(posX, posY);
-        }else{
-            return null;
-        }
+        return new Position(posX, posY);
     }
 
 };
@@ -166,13 +179,14 @@ function setup(){
 function newGraph(){
     clear();
     background(255);
-    graph = new Graph(getRandomIntMinMax(5,8), weighted, oriented);
+    graph = new Graph(getRandomIntMinMax(5,10), weighted, oriented);
+    document.getElementById("algoPrim").disabled = !(weighted && !oriented);
 }
 
 function reset(){
     clear();
     background(255);
-    graph.drawGraph();
+    graph.drawGraph(true);
 }
 
 function draw(){
@@ -209,15 +223,82 @@ function getPressedNode(graph){
     return null;
 }
 
-function prim(graph) {
-    let dist = {};
-    let pred = {};
-    let arbre = [];
-    for (let i = 0 ; i <graph.nodeList.length ; i++){
-        let node = graph.nodeList[i];
-        distance[node.tag] = 9999;
+let primId=0;
+let algo = null;
+
+let Prim = class{
+    constructor(){
+        algo = primId;
+        this.arbre = [];
+        let startNode = graph.nodeList[0];
+        this.arbre.push(startNode);
+        startNode.color = new Color(200,0,0);
+        graph.drawGraph();
+        this.done = false;
     }
-    arbre.push("A");
-    dist["A"] = 0;
-    pred["A"] = 0;
+    step(){
+        if(!this.done) {
+            let minWeight = 999;
+            let minNode = null;
+            let minLink = null;
+            for (let i = 0; i < this.arbre.length; i++) {
+                let currentNode = this.arbre[i];
+                for (let j = 0; j < currentNode.links.length; j++) {
+                    let link = currentNode.links[j];
+                    if (!this.isInTree(link.node1)) {
+                        if (link.weight < minWeight) {
+                            minWeight = link.weight;
+                            minNode = link.node1;
+                            minLink = link;
+                        }
+                    }
+                    if (!this.isInTree(link.node2)) {
+                        if (link.weight < minWeight) {
+                            minWeight = link.weight;
+                            minNode = link.node2;
+                            minLink = link;
+                        }
+                    }
+                }
+            }
+            if (minNode !== null) {
+                this.arbre.push(minNode);
+                minNode.color = new Color(200, 0, 0);
+                minLink.color = new Color(200, 0, 0);
+                graph.drawGraph();
+            }
+            this.checkIfDone();
+        }
+    }
+    isInTree(node){
+        for(let i = 0; i<this.arbre.length; i++) {
+            let n = this.arbre[i];
+            if(node.tag === n.tag){
+                return true;
+            }
+        }
+        return false;
+    }
+    checkIfDone(){
+        let isDone = true;
+        for(let i = 0; i<graph.nodeList.length; i++) {
+            if(!this.isInTree(graph.nodeList[i])){
+                isDone = false;
+            }
+        }
+        this.done = isDone;
+        document.getElementById("stepbtn").disabled = isDone;
+    }
+};
+
+let primAlgo = null;
+function prim() {
+    document.getElementById("stepbtn").disabled = false;
+    primAlgo = new Prim();
+}
+
+function stepAlgorithm(){
+    if(algo === primId){
+        primAlgo.step();
+    }
 }

@@ -39,12 +39,18 @@
             <button class="btn btn-secondary dropdown-toggle" type="button" id="algosDropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Algorithmes
             </button>
-            <div class="dropdown-menu" aria-labelledby="algosDropdownMenuButton">
-                <button class="dropdown-item btn-light" disabled>Prim</button>
+            <div class="dropdown-menu bg-secondary" aria-labelledby="algosDropdownMenuButton">
+                <button id="algoPrim" value="prim" class="dropdown-item btn bg-info" onclick="prim(); showControllers();">Prim</button>
             </div>
+            <button id="stepbtn" class="btn btn-success animationController" type="button" onclick="stepAlgorithm();">
+                <i class="fas fa-step-forward"></i>
+            </button>
+            <button class="btn btn-success animationController" type="button" onclick="reset(); hideControllers();">
+                <i class="fas fa-stop"></i>
+            </button>
         </div>
     </nav>
-    <div id="content" class="w-100" style="height: 94%">
+    <div id="content" class="w-100" style="height: 90%">
         <div id="graphVis"></div>
     </div>
 </main>
@@ -55,6 +61,14 @@
     let conH = document.getElementById("content").clientHeight;
     let canvasW = conW;
     let canvasH = conH-navH;
+
+    function showControllers() {
+        $('.animationController').removeClass('d-none');
+    }
+    function hideControllers() {
+        $('.animationController').addClass('d-none');
+    }
+    hideControllers();
 </script>
 <script src="graph.js?v=1.1"></script>
 </html>
